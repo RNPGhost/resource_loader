@@ -18,9 +18,6 @@ struct Resource {
   std::string id;
 };
 
-int main() {
-}
-
 Resource GetResourceByID(std::string resource_id) {
   return Resource("resource_1");
 }
@@ -43,6 +40,7 @@ void SubmitResourcesForLoading(std::string resource_id) {
       not_loaded.pop();
       dependency_chain.Pop();
       // AddToLoadQueue(current_resource_id);
+      std::cout << "Loaded resouce: " << current_resource_id << "\n";
     } else {
       // otherwise, add unloaded dependencies of the current resource
       // to the not_loaded stack
@@ -64,4 +62,8 @@ void SubmitResourcesForLoading(std::string resource_id) {
       dependency_chain.Push(current_resource.id);
     }
   }
+}
+
+int main() {
+  SubmitResourcesForLoading("resource_1");
 }
