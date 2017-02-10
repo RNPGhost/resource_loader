@@ -13,11 +13,12 @@ class Resource {
   bool operator==(Resource resource) const {
     return (resource.id == id);
   }
-  bool IsLoadRequested() const {
+  bool LoadRequested() const {
     return load_requested_;
   }
   void RequestLoad() {
     load_requested_ = true;
+    std::cout << "Resource Load Requested: " << id << "\n";
   }
   std::vector<std::string> dependency_ids;
   std::string id;
@@ -50,8 +51,12 @@ void SubmitResourcesForLoading(std::string resource_id) {
         dependency_chain.Top() == current_resource_id) {
       not_loaded.pop();
       dependency_chain.Pop();
-      current_resource->RequestLoad();
-      std::cout << "Loaded resource: " << current_resource_id << "\n";
+      // load request is only skipped in the event that
+      // a resource dependency list contains two identical ids
+      if (!current_resource->LoadRequested()) {
+        current_resource->RequestLoad();
+      }
+    
     } else {
       // otherwise, add unloaded dependencies of the current resource
       // to the not_loaded stack
@@ -63,7 +68,7 @@ void SubmitResourcesForLoading(std::string resource_id) {
           std::cout << "Circular dependency detected. Exiting." << "\n";
           return;
         }
-        if (!GetResourceByID(dependency_id)->IsLoadRequested()) {
+        if (!(GetResourceByID(dependency_id)->LoadRequested())) {
           not_loaded.push(dependency_id);
         }
       }
@@ -79,12 +84,17 @@ int main() {
   Resource resource_1 ("resource_1");
   Resource* resource_1_ptr = &resource_1;
   resource_1_ptr->dependency_ids.push_back("resource_2");
+  resource_1_ptr->dependency_ids.push_back("resource_2");
   resources["resource_1"] = resource_1_ptr;
 
   Resource resource_2 ("resource_2");
   Resource* resource_2_ptr = &resource_2;
   resource_2_ptr->dependency_ids.push_back("resource_1");
   resources["resource_2"] = resource_2_ptr;
+
+  SubmitResourcesForLoading("resource_1");
+
+  resource_2_ptr->dependency_ids.clear();
 
   SubmitResourcesForLoading("resource_1");
 }
