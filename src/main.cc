@@ -2,9 +2,11 @@
 #include <iostream>
 #include <stack>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
-struct Resource {
+class Resource {
+ public:
   Resource(std::string resource_id) {
     id = resource_id;
   }
@@ -12,14 +14,21 @@ struct Resource {
     return (resource.id == id);
   }
   bool IsLoadRequested() const {
-    return false;
+    return load_requested_;
+  }
+  void RequestLoad() {
+    load_requested_ = true;
   }
   std::vector<std::string> dependency_ids;
   std::string id;
+ private:
+  bool load_requested_ = false;
 };
 
-Resource GetResourceByID(std::string resource_id) {
-  return Resource("resource_1");
+std::unordered_map<std::string, Resource*> resources;
+
+Resource* GetResourceByID(std::string resource_id) {
+  return resources[resource_id];
 }
 
 void SubmitResourcesForLoading(std::string resource_id) {
@@ -28,10 +37,12 @@ void SubmitResourcesForLoading(std::string resource_id) {
 
   not_loaded.push(resource_id);
   std::string current_resource_id;
+  Resource* current_resource;
 
   while (not_loaded.size() > 0) {
     current_resource_id = not_loaded.top();
-    
+    current_resource = GetResourceByID(current_resource_id);
+
     // if current resource has been added to the dependency chain,
     // it's dependencies have been submitted to be loaded,
     // so we can submit the current resource for loading
@@ -39,31 +50,41 @@ void SubmitResourcesForLoading(std::string resource_id) {
         dependency_chain.Top() == current_resource_id) {
       not_loaded.pop();
       dependency_chain.Pop();
-      // AddToLoadQueue(current_resource_id);
+      current_resource->RequestLoad();
       std::cout << "Loaded resource: " << current_resource_id << "\n";
     } else {
       // otherwise, add unloaded dependencies of the current resource
       // to the not_loaded stack
-      Resource current_resource = GetResourceByID(current_resource_id);
-      for (const Resource& dependency : current_resource.dependency_ids) {
+      for (const std::string dependency_id : current_resource->dependency_ids) {
         // if dependency appears in the dependency chain,
         // // there must be a dependency loop
-        if (dependency_chain.Contains(dependency.id)) {
+        if (dependency_chain.Contains(dependency_id)) {
           // bad things
+          std::cout << "Circular dependency detected. Exiting." << "\n";
           return;
         }
-        if (!GetResourceByID(dependency.id).IsLoadRequested()) {
-          not_loaded.push(dependency.id);
+        if (!GetResourceByID(dependency_id)->IsLoadRequested()) {
+          not_loaded.push(dependency_id);
         }
       }
       // once all dependencies have been submitted to be loaded,
       // the current resource must be added to the dependency chain
       // in order to catch dependency loops
-      dependency_chain.Push(current_resource.id);
+      dependency_chain.Push(current_resource_id);
     }
   }
 }
 
 int main() {
+  Resource resource_1 ("resource_1");
+  Resource* resource_1_ptr = &resource_1;
+  resource_1_ptr->dependency_ids.push_back("resource_2");
+  resources["resource_1"] = resource_1_ptr;
+
+  Resource resource_2 ("resource_2");
+  Resource* resource_2_ptr = &resource_2;
+  resource_2_ptr->dependency_ids.push_back("resource_1");
+  resources["resource_2"] = resource_2_ptr;
+
   SubmitResourcesForLoading("resource_1");
 }
