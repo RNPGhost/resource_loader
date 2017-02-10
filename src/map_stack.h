@@ -11,25 +11,26 @@ template<typename KeyType, typename ValueType>
 class MapStack {
  public:
   void Push(KeyType key, ValueType* value) {
-    key_stack.push(key);
-    map[key] = value;
+    key_stack_.push(key);
+    map_[key] = value;
   }
   ValueType* Pop() {
-    ValueType* value = Peek();
-    key_stack.pop();
-    map.erase(key);
+    KeyType key = key_stack_.top();
+    ValueType* value = map_[key];
+    key_stack_.pop();
+    map_.erase(key);
     return value;
   }
   ValueType* Peek() {
-    KeyType key = key_stack.top();
-    ValueType* value = map[key];
+    KeyType key = key_stack_.top();
+    ValueType* value = map_[key];
     return value;
   }
   bool Contains(KeyType key) {
-    return (map.count(key) > 0);
+    return (map_.count(key) > 0);
   }
   size_t Size() {
-    return key_stack.size();
+    return key_stack_.size();
   }
   
  private:
