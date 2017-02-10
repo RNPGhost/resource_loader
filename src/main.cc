@@ -42,7 +42,7 @@ void SubmitResourcesForLoading(std::string resource_id) {
         dependency_chain.Top() == current_resource_id) {
       not_loaded.pop();
       dependency_chain.Pop();
-      // AddToLoadQueue(current_resource);
+      // AddToLoadQueue(current_resource_id);
     } else {
       // otherwise, add unloaded dependencies of the current resource
       // to the not_loaded stack

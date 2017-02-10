@@ -6,4 +6,4 @@ all: bin/resource_loader
 
 # Specify the object files needed to generate the binary. These are always the
 # same name as the cc files.
-bin/event_manager: $(patsubst src/%.cc, obj/%.o, $(wildcard src/*.cc))
+bin/resource_loader: $(patsubst src/%.cc, obj/%.o, $(wildcard src/*.cc))
