@@ -1,24 +1,10 @@
+#include "resource.h"
 #include <iostream>
 #include <stack>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-
-class Resource {
- public:
-  Resource(std::string resource_id) {
-    id = resource_id;
-  }
-  bool operator==(Resource resource) const {
-    return (resource.id == id);
-  }
-  void RequestLoad() {
-    std::cout << "-- Resource Load Requested: " << id << " --\n";
-  }
-  std::vector<std::string> dependency_ids;
-  std::string id;
-};
 
 std::unordered_map<std::string, Resource*> resources;
 
