@@ -76,19 +76,17 @@ void SubmitResourcesForLoading(std::string resource_id) {
 
 int main() {
   Resource resource_1 ("resource_1");
-  Resource* resource_1_ptr = &resource_1;
-  resource_1_ptr->dependency_ids.push_back("resource_2");
-  resource_1_ptr->dependency_ids.push_back("resource_2");
-  resources["resource_1"] = resource_1_ptr;
+  resource_1.dependency_ids.push_back("resource_2");
+  resource_1.dependency_ids.push_back("resource_2");
+  resources["resource_1"] = &resource_1;
 
   Resource resource_2 ("resource_2");
-  Resource* resource_2_ptr = &resource_2;
-  resource_2_ptr->dependency_ids.push_back("resource_1");
-  resources["resource_2"] = resource_2_ptr;
+  resource_2.dependency_ids.push_back("resource_1");
+  resources["resource_2"] = &resource_2;
 
   SubmitResourcesForLoading("resource_1");
 
-  resource_2_ptr->dependency_ids.clear();
+  resource_2.dependency_ids.clear();
 
   SubmitResourcesForLoading("resource_1");
 }
