@@ -39,15 +39,10 @@ void SubmitResourcesForLoading(std::string resource_id) {
     current_resource_id = not_loaded.top();
     current_resource = GetResourceByID(current_resource_id);
 
-    // if current resource has been added to the dependency chain,
-    // it's dependencies must already have been loaded
-    // so we can submit the current resource for loading
-    if (dependency_chain.count(current_resource_id) > 0) {
-      not_loaded.pop();
-      dependency_chain.erase(current_resource_id);
-      current_resource->RequestLoad();
-    } else {
-      // otherwise, mark fresh dependencies as not loaded
+    // if the current resource is not in the dependency chain
+    // then its dependencies have not yet been expanded
+    if (dependency_chain.count(current_resource_id) == 0) {
+      // mark fresh dependencies as not loaded
       for (const std::string dependency_id : current_resource->dependency_ids) {
         // if dependency appears in the dependency chain,
         // there must be a dependency loop
@@ -58,6 +53,7 @@ void SubmitResourcesForLoading(std::string resource_id) {
         // only mark a dependency id as not loaded if
         // it isn't already marked as required
         if (load_required.count(dependency_id) == 0) {
+          // all resources marked as not loaded are required
           load_required.insert(dependency_id);
           not_loaded.push(dependency_id);
           std::cout << "added " << dependency_id << " to not_loaded\n";
@@ -68,6 +64,14 @@ void SubmitResourcesForLoading(std::string resource_id) {
       // in order to catch dependency loops
       dependency_chain.insert(current_resource_id);
       std::cout << "added " << current_resource_id << " to dependency_chain\n";
+
+    // otherwise, if the current resource in the dependency chain, 
+    // dependencies have already been expanded,
+    // so we can request load and discard it
+    } else {
+      not_loaded.pop();
+      dependency_chain.erase(current_resource_id);
+      current_resource->RequestLoad();
     }
   }
 }
