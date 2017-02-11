@@ -9,4 +9,4 @@ class Loader {
   Resource* GetResourceByID(std::string id);
  private:
   std::unordered_map<std::string, Resource*> resources_;
-}
+};
