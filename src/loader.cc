@@ -11,7 +11,11 @@ void Loader::AddResource(Resource* resource) {
   resources_[resource->id] = resource;
 }
 
-void Loader::SubmitResourcesForLoading(std::string resource_id) {
+void Loader::RequestLoad(std::string resource_id) {
+  std::cout << "-- Load Requested: " << resource_id << " --\n"; 
+}
+
+void Loader::FindAndLoadDependencies(std::string resource_id) {
   // contains resources that are currently known to be required
   // but that haven't requested loading
   std::stack<std::string> not_loaded;
