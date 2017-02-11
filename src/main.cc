@@ -27,8 +27,13 @@ Resource* GetResourceByID(std::string resource_id) {
 }
 
 void SubmitResourcesForLoading(std::string resource_id) {
+  // contains resources that are currently known to be required
+  // but that haven't requested loading
   std::stack<std::string> not_loaded;
+  // contains resources that have had their dependencies expanded
+  // but haven't requested loading
   std::unordered_set<std::string> dependency_chain;
+  // contains resources that are currently known to be required
   std::unordered_set<std::string> load_required;
 
   not_loaded.push(resource_id);
