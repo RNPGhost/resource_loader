@@ -4,8 +4,8 @@
 Resource::Resource(std::string id, 
                    std::vector<std::string> dependency_ids, 
                    Loader* loader) 
-    : id(id),
-      dependency_ids(dependency_ids),
+    : dependency_ids(dependency_ids),
+      id(id),
       loader_(loader)
 {}
 
