@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 class Resource {
  public:
   Resource(std::string resource_id);

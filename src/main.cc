@@ -34,7 +34,7 @@ void SubmitResourcesForLoading(std::string resource_id) {
     // then its dependencies have not yet been expanded
     if (dependency_chain.count(current_resource_id) == 0) {
       // mark fresh dependencies as not loaded
-      for (const std::string dependency_id : current_resource->dependency_ids) {
+      for (const std::string& dependency_id : current_resource->dependency_ids) {
         // if dependency appears in the dependency chain,
         // there must be a dependency loop
         if (dependency_chain.count(dependency_id) > 0) {
