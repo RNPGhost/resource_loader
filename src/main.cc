@@ -1,4 +1,3 @@
-#include "set_stack.h"
 #include <iostream>
 #include <stack>
 #include <string>
@@ -29,7 +28,7 @@ Resource* GetResourceByID(std::string resource_id) {
 
 void SubmitResourcesForLoading(std::string resource_id) {
   std::stack<std::string> not_loaded;
-  SetStack<std::string> dependency_chain;
+  std::unordered_set<std::string> dependency_chain;
   std::unordered_set<std::string> load_required;
 
   not_loaded.push(resource_id);
@@ -43,17 +42,16 @@ void SubmitResourcesForLoading(std::string resource_id) {
     // if current resource has been added to the dependency chain,
     // it's dependencies must already have been loaded
     // so we can submit the current resource for loading
-    if (dependency_chain.Size() > 0 &&
-        dependency_chain.Top() == current_resource_id) {
+    if (dependency_chain.count(current_resource_id) > 0) {
       not_loaded.pop();
-      dependency_chain.Pop();
+      dependency_chain.erase(current_resource_id);
       current_resource->RequestLoad();
     } else {
       // otherwise, mark fresh dependencies as not loaded
       for (const std::string dependency_id : current_resource->dependency_ids) {
         // if dependency appears in the dependency chain,
         // there must be a dependency loop
-        if (dependency_chain.Contains(dependency_id)) {
+        if (dependency_chain.count(dependency_id) > 0) {
           std::cout << "-- Circular dependency detected: Exiting --\n";
           return;
         }
@@ -68,7 +66,7 @@ void SubmitResourcesForLoading(std::string resource_id) {
       // once all dependencies have been marked for loading,
       // the current resource must be added to the dependency chain
       // in order to catch dependency loops
-      dependency_chain.Push(current_resource_id);
+      dependency_chain.insert(current_resource_id);
       std::cout << "added " << current_resource_id << " to dependency_chain\n";
     }
   }
